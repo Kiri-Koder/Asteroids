@@ -7,6 +7,7 @@ class Player(CircleShape):
     def __init__(self, x, y):
         super().__init__(x, y, PLAYER_RADIUS)
         self.rotation = 0
+        self.cooldown = 0
 
     #supporting method for the player draw method. player should show as a triangle, even though they will be a CircleShape based object.
     def triangle(self) -> list[pygame.Vector2]:
@@ -29,7 +30,10 @@ class Player(CircleShape):
     #updates positions for player ship based on player input
     def update(self, dt: float) -> None:
         keys = pygame.key.get_pressed()
-
+        if self.cooldown > 0:
+            self.cooldown -= dt
+        else:
+            self.cooldown = 0
         if keys[pygame.K_a]:
             self.rotate(-dt)
         if keys[pygame.K_d]:
@@ -39,7 +43,11 @@ class Player(CircleShape):
         if keys[pygame.K_s]:
             self.move(-dt)
         if keys[pygame.K_SPACE]:
-            self.shoot()
+            if self.cooldown > 0:
+                pass
+            else:
+                self.shoot()
+                self.cooldown = PLAYER_SHOOT_COOLDOWN_SECONDS
 
     #supporting method for the update method to allow for moving the player ship.
     def move(self, dt):
